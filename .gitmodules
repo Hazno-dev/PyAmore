@@ -1,0 +1,3 @@
+[submodule "External/LibDetour"]
+	path = External/LibDetour
+	url = https://github.com/8dcc/libdetour.git

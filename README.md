@@ -4,7 +4,7 @@ PyAmore is a PyArmo(u)r runtime deobfuscator designed to extract/generate PYC fi
 
 ## Supported Features
 
-PyAmore has been tested with PyArmour **V8** and Python `3.7` but PyArmour has so many settings that I can't guarantee it works for every setup.
+PyAmore has been tested with PyArmour **V8** and Python `3.7` but PyArmour has so many settings that I can't guarantee it works for every setup. Nonetheless, here's the features PyAmore aims to support: 
 
 - Automatic stripping of PyArmour from bytecode 
 - Recursive deobfuscation of code objects
@@ -50,9 +50,11 @@ __pyarmor__(__name__, __file__, b'\x02\x0a...', 1)
 
 ## Usage
 
+PyAmore assumes your target application consumes a `pyTransform.so` library.
+
 ### Linux:
 
-Preload the object and execute your script (i.e. `LD_PRELOAD=/home/../PyAmore.so sh init.sh`
+Preload the object and execute your script (i.e. `LD_PRELOAD=/home/../PyAmore.so sh myTargetPyPackage.sh`
 
 ### Windows:
 

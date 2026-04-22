@@ -4,7 +4,7 @@ PyAmore is a PyArmour runtime deobfuscator designed to extract/generate PYC file
 
 ## Supported Features
 
-PyAmore has been tested with PyArmour **V8** but PyArmour has so many settings that I can't guarantee it works for every setup.
+PyAmore has been tested with PyArmour **V8** and Python `3.7` but PyArmour has so many settings that I can't guarantee it works for every setup.
 
 - Automatic stripping of PyArmour from bytecode 
 - Recursive deobfuscation of code objects
@@ -60,7 +60,7 @@ TBD
 
 ## Building
 
-PyAmore has been built and tested on `clang version 19.1.7` target `x86_64-pc-linux-gnu` and cmake `4.3.1`.
+PyAmore has been built and tested on `clang version 19.1.7` target `x86_64-pc-linux-gnu` with `Python 3.7` and cmake `4.3.1`.
 
 *Note:* PyAmore uses C++20 modules. A modern, up-to-date compiler will be required.
 
@@ -69,4 +69,18 @@ PyAmore has been built and tested on `clang version 19.1.7` target `x86_64-pc-li
 - `cmake build .`
 
 Use the build artifact `lib/PyAmore` for injection.
+
+### Changing the Python version
+
+Edit CMakeLists.txt with the target version.
+You may be required to build python from source so the project can link against Python as a shared object, though this frankly may not be required, I didn't test it, so YMMV. 
+
+```
+find_package(Python 3.7 # YOUR PYTHON VERSION HERE!
+        EXACT
+        COMPONENTS
+        Interpreter
+        Development.Embed
+)
+```
 

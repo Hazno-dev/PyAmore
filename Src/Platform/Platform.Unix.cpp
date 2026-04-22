@@ -4,9 +4,11 @@ module;
 
 #include <cstring>
 #include <dlfcn.h>
+#include <cassert>
 
 module Platform;
 import PyAmoreTransform;
+import Core;
 
 typedef void* (*dlopen_t)(const char*, int);
 static dlopen_t RealDlOpen = nullptr;
@@ -17,7 +19,7 @@ static dlsym_t RealDlSym = nullptr;
 extern "C" void *dlsym(void *handle, const char *name)
 {
     if (!RealDlSym) {
-        RealDlSym = static_cast<dlsym_t>(dlvsym(RTLD_NEXT, "dlsym", "GLIBC_2.2.5"));
+        RealDlSym = reinterpret_cast<dlsym_t>(dlvsym(RTLD_NEXT, "dlsym", "GLIBC_2.2.5"));
     }
 
     if (handle != PyAmoreTransform::GetHandle()) {
@@ -25,12 +27,23 @@ extern "C" void *dlsym(void *handle, const char *name)
     }
 
     if (strcmp(name, "init_module") == 0) {
-        if (PyAmoreTransform::Hook_InitModule.GetTarget() == nullptr) {
-            Log("Attempted to find init_module before library even loaded???");
-            return nullptr;
-        }
-
+        assert(PyAmoreTransform::Hook_InitModule.GetTarget() != nullptr);
         return PyAmoreTransform::Hook_InitModule.GetTrampoline();
+    }
+
+    if (strcmp(name, "init_runtime") == 0) {
+        assert(PyAmoreTransform::Hook_InitRuntime.GetTarget() != nullptr);
+        return PyAmoreTransform::Hook_InitRuntime.GetTrampoline();
+    }
+
+    if (strcmp(name, "set_option") == 0) {
+        assert(PyAmoreTransform::Hook_SetOption.GetTarget() != nullptr);
+        return PyAmoreTransform::Hook_SetOption.GetTrampoline();
+    }
+
+    if (strcmp(name, "import_module") == 0) {
+        assert(PyAmoreTransform::Hook_ImportModule.GetTarget() != nullptr);
+        return PyAmoreTransform::Hook_ImportModule.GetTrampoline();
     }
 
     void* ret = RealDlSym(handle, name);
@@ -53,11 +66,11 @@ extern "C" void *dlsym(void *handle, const char *name)
 extern "C" void* dlopen(const char* filename, int flags)
 {
     if (!RealDlSym) {
-        RealDlSym = (dlsym_t)dlvsym(RTLD_NEXT, "dlsym", "GLIBC_2.2.5");
+        RealDlSym = reinterpret_cast<dlsym_t>(dlvsym(RTLD_NEXT, "dlsym", "GLIBC_2.2.5"));
     }
 
     if (!RealDlOpen) {
-        RealDlOpen = (dlopen_t)RealDlSym(RTLD_NEXT, "dlopen");
+        RealDlOpen = reinterpret_cast<dlopen_t>(RealDlSym(RTLD_NEXT, "dlopen"));
     }
 
     void* handle = RealDlOpen(filename, flags);
@@ -79,6 +92,6 @@ namespace Platform
 {
     void* FindExport(void* handle, const char* name)
     {
-        return dlsym(handle, name);
+        return RealDlSym(handle, name);
     }
 }

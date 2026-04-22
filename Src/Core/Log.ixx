@@ -21,16 +21,21 @@ module;
 
 export module Core:Log;
 
-inline std::ofstream* GetLog()
+inline std::ofstream& GetLog()
 {
     static std::ofstream log(std::filesystem::current_path() / "PyAmore.log", std::ios::out | std::ios::trunc);
-    return &log;
+    return log;
 }
 
 export {
+
     template <typename... Args>
     void Log(std::format_string<Args...> fmt, Args&&... args) {
         GetLog() << std::format(fmt, std::forward<Args>(args)...) << std::endl << std::flush;
+    }
+
+    void Log(const std::string_view str) {
+        GetLog() << str << std::endl << std::flush;
     }
 
     inline void LogPy(const char* name, PyObject *obj) {
@@ -69,5 +74,12 @@ export {
             }
         }
         return output.str();
+    }
+
+    std::string PyStr(PyObject* obj)
+    {
+        PyObject* repr = PyObject_Repr(obj);
+        PyObject* str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+        return PyBytes_AS_STRING(str);
     }
 }

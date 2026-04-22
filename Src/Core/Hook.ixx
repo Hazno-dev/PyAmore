@@ -2,7 +2,11 @@
 
 module;
 
-#include <libdetour.h>
+#include <type_traits>
+#include <Python.h>
+#include <ceval.h>
+
+#include "Hook.h"
 
 export module Core:Hook;
 import :Types;
@@ -22,15 +26,25 @@ export {
 			using FnType = Ret(*)(Args...);
 
 	        bool m_detoured = false;
-			FnType m_trampoline = nullptr;
 			FnType m_target = nullptr;
-            uint8 saved_bytes[LIBDETOUR_JMP_SZ_] = {};
+			FnType m_trampoline = nullptr;
+            uint8 m_saved_bytes[LIBDETOUR_JMP_SZ_] = {};
 
 		public:
 			constexpr Hook() = default;
-			constexpr Hook(const FnType trampoline, const FnType target) : m_trampoline(trampoline), m_target(target) {}
-			explicit constexpr Hook(const FnType trampoline, const FnType target, const bool enable) : m_trampoline(trampoline), m_target(target)
+			constexpr Hook(const FnType trampoline, const FnType target) : m_target(target), m_trampoline(trampoline)
 			{
+			    if (m_target) {
+			        memcpy(m_saved_bytes, reinterpret_cast<void*>(m_target), sizeof(m_saved_bytes));
+			    }
+			}
+
+			explicit constexpr Hook(const FnType trampoline, const FnType target, const bool enable) : m_target(target), m_trampoline(trampoline)
+			{
+			    if (m_target) {
+			        memcpy(m_saved_bytes, reinterpret_cast<void*>(m_target), sizeof(m_saved_bytes));
+			    }
+
 				if (enable) {
 					Enable();
 				}
@@ -47,6 +61,7 @@ export {
 			Hook& WithTarget(FnType target)
 			{
 				m_target = target;
+			    memcpy(m_saved_bytes, reinterpret_cast<void*>(m_target), sizeof(m_saved_bytes));
 				return *this;
 			}
 
@@ -54,8 +69,16 @@ export {
 			Hook& WithTarget(Fn target)
 			{
 				m_target = reinterpret_cast<FnType>(target);
+			    memcpy(m_saved_bytes, reinterpret_cast<void*>(m_target), sizeof(m_saved_bytes));
 				return *this;
 			}
+
+	        Hook& WithTarget(PyCFunctionObject* pyFunc)
+            {
+                m_target = reinterpret_cast<FnType>(PyCFunction_GET_FUNCTION(pyFunc));
+			    memcpy(m_saved_bytes, reinterpret_cast<void*>(m_target), sizeof(m_saved_bytes));
+                return *this;
+            }
 
 			bool TryEnable(const char* name = "Unnamed Node")
 			{
@@ -74,6 +97,7 @@ export {
 				    return false;
 				}
 
+			    //Log("Enabled {} on target {}", name, reinterpret_cast<void*>(m_target));
 			    return true;
 			}
 
@@ -95,23 +119,30 @@ export {
 			    }
 			}
 
-			Ret Call(Args... args) const
+			Ret Call(Args... args)
 			{
 				if (!m_target) {
 					Log("Hook Node called without trampoline or target set");
 					return Ret();
 				}
 
-			    Disable();
+			    const auto shouldToggle = m_detoured;
+			    if (shouldToggle) {
+			        Disable();
+			    }
 
-			    if (constexpr bool is_void = std::is_same_v<Ret, void>) {
+			    if constexpr (std::is_same_v<Ret, void>) {
                     m_target(args...);
-                    Enable();
+			        if (shouldToggle) {
+			            Enable();
+			        }
                     return void();
                 }
 
 			    auto res = m_target(args...);
-			    Enable();
+			    if (shouldToggle) {
+			        Enable();
+			    }
 			    return res;
 			}
 

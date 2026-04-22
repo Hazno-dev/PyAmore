@@ -78,6 +78,11 @@ export {
 
     std::string PyStr(PyObject* obj)
     {
+        if (PyUnicode_Check(obj)) {
+            const char* s = PyUnicode_AsUTF8(obj);
+            return s ? s : "";
+        }
+
         PyObject* repr = PyObject_Repr(obj);
         PyObject* str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
         return PyBytes_AS_STRING(str);

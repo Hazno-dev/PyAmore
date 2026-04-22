@@ -38,12 +38,15 @@ target_sources(PyAmore
         Src/Amore/Transform.ixx
         Src/Amore/Encryption/Encryption.ixx
         Src/Amore/Encryption/Encryption.SymmetricSXOR.ixx
+        Src/Amore/Code/Code.ixx
+        Src/Amore/Code/Code.Unpack.ixx
 )
 
 target_sources(PyAmore
         PRIVATE
         Src/Amore/Transform.cpp
-        Src/Amore/Transform.Builtins.cpp)
+        Src/Amore/Transform.Builtins.cpp
+        Src/Amore/Code/Code.Unpack.cpp)
 
 if (UNIX)
     target_sources(PyAmore

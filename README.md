@@ -94,5 +94,5 @@ It abuses the fact PyArmour will simply extract the target code from `PyEval_Get
 ## Sources
 
 - [8dcc/LibDetour](https://github.com/8dcc/libdetour)
-- [cyber.wtf/unpacking-pyarmor](https://cyber.wtf/2025/02/12/unpacking-pyarmor-v8-scripts/)
+- [Leonard Rapp, Melissa Eckardt @ cyber.wtf/unpacking-pyarmor](https://cyber.wtf/2025/02/12/unpacking-pyarmor-v8-scripts/)
 - [pyarmor.readthedocs.io](https://pyarmor.readthedocs.io/en/stable/topic/obfuscated-script.html)

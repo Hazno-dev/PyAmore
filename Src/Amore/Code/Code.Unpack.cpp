@@ -66,9 +66,7 @@ namespace Code
             for (auto i = 0; i < len; i += 2) {
                 uint8_t opcode = bytecode[i];
                 uint32_t arg = 0;
-                Py_ssize_t instr_start = i;
 
-                // Handle EXTENDED_ARG chain
                 while (opcode == EXTENDED_ARG) {
                     arg = (arg << 8) | bytecode[i + 1];
                     i += 2;
@@ -78,8 +76,8 @@ namespace Code
                 arg = (arg << 8) | bytecode[i + 1];
 
                 if (HASJABS(opcode)) {
-                    uint32_t new_arg = arg - start;
-                    bytecode[i + 1] = (uint8_t)new_arg;
+                    const uint32_t new_arg = arg - start;
+                    bytecode[i + 1] = static_cast<uint8_t>(new_arg);
                 }
             }
         }

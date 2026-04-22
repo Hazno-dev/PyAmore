@@ -1,6 +1,6 @@
 # PyAmore
 
-PyAmore is a PyArmour runtime deobfuscator designed to extract/generate PYC files from encrypted python artifacts.
+PyAmore is a PyArmo(u)r runtime deobfuscator designed to extract/generate PYC files from encrypted python artifacts.
 
 ## Supported Features
 
@@ -90,3 +90,9 @@ PyAmour ships with a library `pyTransform.so/.dll/etc` which implements the core
 
 PyAmore shims some of these exported functions using dlsym (to avoid a presumed digest check?) or runtime hooking.
 It abuses the fact PyArmour will simply extract the target code from `PyEval_GetFrame` to force it to decrypt all codeobjects found in a given module, and then copies it all to a new hierarchy for extraction to a `.pyc` of the same name.
+
+## Sources
+
+- [8dcc/LibDetour](https://github.com/8dcc/libdetour)
+- [cyber.wtf/unpacking-pyarmor](https://cyber.wtf/2025/02/12/unpacking-pyarmor-v8-scripts/)
+- [pyarmor.readthedocs.io](https://pyarmor.readthedocs.io/en/stable/topic/obfuscated-script.html)

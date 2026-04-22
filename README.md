@@ -75,7 +75,8 @@ Use the build artifact `lib/PyAmore` for injection.
 Edit CMakeLists.txt with the target version.
 You may be required to build python from source so the project can link against Python as a shared object, though this frankly may not be required, I didn't test it, so YMMV. 
 
-```find_package(Python 3.7 # YOUR PYTHON VERSION HERE!
+```
+find_package(Python 3.7 # YOUR PYTHON VERSION HERE!
         EXACT
         COMPONENTS
         Interpreter

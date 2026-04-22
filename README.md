@@ -84,3 +84,9 @@ find_package(Python 3.7 # YOUR PYTHON VERSION HERE!
 )
 ```
 
+## What Does PyAmore Do?
+
+PyAmour ships with a library `pyTransform.so/.dll/etc` which implements the core functionality behind PyArmour.
+
+PyAmore shims some of these exported functions using dlsym (to avoid a presumed digest check?) or runtime hooking.
+It abuses the fact PyArmour will simply extract the target code from `PyEval_GetFrame` to force it to decrypt all codeobjects found in a given module, and then copies it all to a new hierarchy for extraction to a `.pyc` of the same name.
